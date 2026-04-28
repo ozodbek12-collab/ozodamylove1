@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Озода — Моя Бесконечность</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Marck+Script&family=Montserrat:wght@300;600&family=Playfair+Display:italic,wght@0,700;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent: #ff4d6d;
+            --gold: #d4af37;
+            --dark: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.88);
+            --shadow: 0 20px 60px rgba(255, 77, 109, 0.25);
+        }
+
+        * { box-sizing: border-box; cursor: crosshair; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #fffafa 0%, #ffe4e4 100%);
+            margin: 0; padding: 0;
+            color: #333; overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- КИНЕМАТОГРАФИЧНОЕ ИНТРО --- */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 10000;
+            transition: 1.2s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+
+        .heart-main {
+            position: relative;
+            width: 100px; height: 100px;
+            background: var(--accent);
+            transform: rotate(-45deg);
+            box-shadow: 0 0 50px var(--accent);
+            animation: heartPulse 1.2s infinite ease-in-out;
+            margin-bottom: 60px;
+        }
+        .heart-main::before, .heart-main::after {
+            content: ''; position: absolute; width: 100px; height: 100px;
+            background: var(--accent); border-radius: 50%;
+        }
+        .heart-main::before { top: -50px; left: 0; }
+        .heart-main::after { left: 50px; top: 0; }
+
+        .intro-title {
+            font-family: 'Great Vibes', cursive;
+            color: white;
+            font-size: clamp(1.8em, 6vw, 3em);
+            opacity: 0;
+            letter-spacing: 4px;
+            transform: translateY(20px);
+            animation: introTextReveal 2.5s forwards 0.8s;
+        }
+
+        @keyframes heartPulse {
+            0%, 100% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.15); }
+        }
+        @keyframes introTextReveal {
+            to { opacity: 1; transform: translateY(0); letter-spacing: 2px; }
+        }
+
+        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+        /* --- КОНТЕНТ --- */
+        .main-wrapper {
+            opacity: 0;
+            transition: opacity 1.5s ease-in;
+            padding: 40px 0 100px;
+        }
+        .main-wrapper.visible { opacity: 1; }
+
+        .container { width: 92%; max-width: 800px; margin: 0 auto; position: relative; }
+
+        h1 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2em, 8vw, 4.5em);
+            background: linear-gradient(45deg, var(--accent), var(--gold), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        /* ФИКСИРОВАННЫЙ СЧЕТЧИК 730 ДНЕЙ */
+        .counter-wrap {
+            text-align: center;
+            margin: 30px auto 50px;
+        }
+        .days-box {
+            display: inline-block;
+            background: white;
+            padding: 25px 50px;
+            border-radius: 100px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Блик на счетчике */
+        .days-box::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: rotate(45deg); animation: shine 4s infinite;
+        }
+        @keyframes shine { 0% { transform: translateX(-150%) rotate(45deg); } 100% { transform: translateX(150%) rotate(45deg); } }
+
+        .days-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            font-weight: 700;
+            color: var(--accent);
+            display: block; line-height: 1;
+        }
+        .days-label { font-size: 0.8em; letter-spacing: 3px; color: #999; text-transform: uppercase; }
+
+        /* КАРТОЧКА ПИСЬМА */
+        .letter-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: clamp(25px, 8vw, 60px);
+            border-radius: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.7);
+            margin-bottom: 60px;
+        }
+        .letter-text {
+            font-family: 'Marck Script', cursive;
+            font-size: clamp(1.3em, 4.5vw, 1.8em);
+            line-height: 1.7; color: #222;
+        }
+        .signature {
+            text-align: right;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2em; color: var(--accent);
+            margin-top: 30px;
+        }
+
+        /* ГАЛЕРЕЯ */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .photo-wrap {
+            background: white; padding: 12px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: 0.5s ease;
+            opacity: 0; transform: translateY(30px);
+        }
+        .photo-wrap.show { opacity: 1; transform: translateY(0); }
+        .photo-wrap:hover { transform: translateY(-10px); }
+        .photo-wrap img { width: 100%; height: 400px; object-fit: cover; border-radius: 15px; }
+
+        /* ИСПРАВЛЕННЫЕ НАДПИСИ ПРИ КЛИКЕ (БЕЗ БАГОВ) */
+        .word-pop {
+            position: fixed; /* Фиксировано, чтобы не двигать верстку */
+            pointer-events: none;
+            z-index: 10001;
+            font-family: 'Marck Script', cursive;
+            font-size: 1.8em;
+            color: var(--accent);
+            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
+            animation: floatUp 2s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -120px) scale(1); }
+        }
+
+        .music-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: white; border: none; box-shadow: var(--shadow);
+            font-size: 1.5em; z-index: 1000; transition: 0.3s;
+        }
+        .music-btn.playing { background: var(--accent); color: white; }
+
+        footer { text-align: center; padding: 50px; color: var(--accent); opacity: 0.4; font-size: 0.7em; letter-spacing: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="preloader">
+        <div class="heart-main"></div>
+        <div class="intro-title">Ozoda, Forever In My Heart</div>
+    </div>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <div class="main-wrapper" id="main-content">
+        <div class="container">
+            <h1>Для моей Озоды</h1>
+
+            <div class="counter-wrap">
+                <div class="days-box">
+                    <span class="days-num">730</span>
+                    <span class="days-label">Дней мы вместе</span>
+                </div>
+            </div>
+
+            <div class="letter-card">
+                <div class="letter-text">
+                    <p><strong>Моя дорогая Озода,</strong></p>
+                    <p>Я пишу эти строки, и моё сердце наполняется нежностью. Ты — самое прекрасное, что когда-либо случалось со мной. Моя первая, настоящая и самая чистая любовь. 💋</p>
+                    <p>Этот сайт — не просто код. Это мой способ сказать тебе, что даже когда нас разделяет расстояние, я всегда рядом. Каждая деталь здесь создана с мыслью о тебе, о твоей улыбке и твоём свете.</p>
+                    <p>Береги себя ради меня. Ты мой мир, моё вдохновение и моё "навсегда".</p>
+                    <div class="signature">Твой Алимов</div>
+                </div>
+            </div>
+
+            <div class="gallery">
+                <div class="photo-wrap">
+                    <img src="images/ozoda1.jpg" alt="Озода">
+                </div>
+                <div class="photo-wrap">
+                    <img src="images/ozoda2.jpg" alt="Озода">
+                </div>
+            </div>
+        </div>
+        <footer>LOVED BY ALIMOV &bull; FOREVER</footer>
+    </div>
+
+    <button class="music-btn" id="mBtn" onclick="togglePlay()">🎵</button>
+    <audio id="love-audio" loop><source src="your-song-link.mp3" type="audio/mpeg"></audio>
+<script>
+        // 1. УПРАВЛЕНИЕ ИНТРО И ВХОДОМ
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const content = document.getElementById('main-content');
+
+            setTimeout(() => {
+                preloader.style.transform = 'translateY(-100%)';
+                content.classList.add('visible');
+                
+                // Запуск анимации появления фото при скролле
+                initScrollAnim();
+            }, 4000); // 4 секунды, чтобы Озода насладилась интро
+        });
+
+        // 2. ИСПРАВЛЕННЫЕ НАДПИСИ (ФИКС БАГА)
+        const loveWords = ["Люблю", "Озода", "Навсегда", "Моя Вселенная", "Счастье", "❤️", "Только ты", "Единственная"];
+        
+        document.addEventListener('mousedown', (e) => {
+            // Игнорируем клики по кнопке музыки, чтобы не мешать управлению
+            if(e.target.closest('.music-btn')) return;
+
+            const word = document.createElement('div');
+            word.className = 'word-pop';
+            word.innerText = loveWords[Math.floor(Math.random() * loveWords.length)];
+            
+            // Позиционируем строго в месте клика
+            word.style.left = e.clientX + 'px';
+            word.style.top = e.clientY + 'px';
+            
+            document.body.appendChild(word);
+
+            // Удаляем элемент после завершения анимации, чтобы не копились в памяти
+            setTimeout(() => {
+                word.remove();
+            }, 2000);
+        });
+
+        // 3. МАГИЧЕСКИЙ ФОН (ЧАСТИЦЫ)
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 77, 109, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 4. ЛЕТЯЩИЕ СЕРДЦА
+        function createPetal() {
+            const p = document.createElement('div');
+            p.innerHTML = '❤';
+            p.style.cssText = `
+                position: fixed;
+                top: -30px;
+                left: ${Math.random() * 100}vw;
+                color: var(--accent);
+                font-size: ${Math.random() * 10 + 15}px;
+                opacity: ${Math.random() * 0.5 + 0.2};
+                pointer-events: none;
+                z-index: 0;
+                transition: transform ${Math.random() * 4 + 5}s linear;
+            `;
+            document.body.appendChild(p);
+
+            setTimeout(() => {
+                p.style.transform = `translate(${Math.random() * 100 - 50}px, ${window.innerHeight + 50}px) rotate(${Math.random() * 360}deg)`;
+            }, 100);
+
+            setTimeout(() => p.remove(), 9000);
+        }
+        setInterval(createPetal, 800);
+
+        // 5. АНИМАЦИЯ ФОТО
+        function initScrollAnim() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('show');
+                });
+            }, { threshold: 0.2 });
+
+            document.querySelectorAll('.photo-wrap').forEach(el => observer.observe(el));
+        }
+
+        // 6. МУЗЫКА
+        function togglePlay() {
+            const audio = document.getElementById('love-audio');
+            const btn = document.getElementById('mBtn');
+            
+            if (audio.paused) {
+                audio.play();
+                btn.classList.add('playing');
+                btn.innerText = '⏸';
+            } else {
+                audio.pause();
+                btn.classList.remove('playing');
+                btn.innerText = '🎵';
+            }
+        }
+    </script>
+</body>
+</html>
